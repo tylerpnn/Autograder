@@ -6,12 +6,49 @@ import edu.gatech.cs1331.json.ClassJson.MethodJson;
 
 public class Application {
 	
+	private static String jsonFileName;
+	private static String testClassName;
+	
 	public static void main(String ... args) {
 		if(args.length == 0) {
 			return;
 		}
 		
-		testParse(args[0]);
+		for(int i = 0; i < args.length; i++) {
+			if(args.length - i - 1 > 0) {
+				if(args[i].equals("-j")) {
+					jsonFileName = args[i+1];
+				} else if(args[i].equals("-t")) {
+					testClassName = args[i+1];
+				} else if(args[i].equals("-h")) {
+					printHelp();
+					System.exit(0);
+				}
+			}
+		}
+		
+//		if(jsonFileName != null) testParse(jsonFileName);
+		
+		if(jsonFileName == null || testClassName == null) {
+			printHelp();
+		}
+		
+		Tester t = new Tester(testClassName);
+		AutoGraderJson agj = AutoGraderJson.buildClassList(jsonFileName);
+		try {
+			t.runTests(agj);
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		System.out.println("\n" + t.toString());
+	}
+	
+	public static void printHelp() {
+		System.out.printf("%s\n%s\n%s\n%s\n",
+				"Autograder help:",
+				"\t-j\tJson filename",
+				"\t-t\tTest Class Name",
+				"\t-h\tPrint this help");
 	}
 	
 	public static void testParse(String filename) {

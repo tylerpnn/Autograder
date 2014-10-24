@@ -1,0 +1,14 @@
+{
+	"tests": [
+		{
+			"name": "foo",
+			"points": 20,
+			"comment": "you failed foo"
+		},
+		{
+			"name": "doSomething",
+			"points": 15,
+			"comment": "you failed doSomething"
+		}
+	]
+}
