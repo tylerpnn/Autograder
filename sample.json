@@ -1,0 +1,79 @@
+{
+	"classes": [
+		{
+			"className": "ClassName",
+			"superClassName": "ParentClass",
+			"interfaces": ["Comparable"],
+			"constructors": [
+				{
+					"params": ["String", "int"]
+				},
+				{
+					"params": ["int"]
+				}
+			],
+			"methods": [
+				{
+					"visibility": "public",
+					"returnType": "void",
+					"name": "foo",
+					"params": ["String", "int"]
+				},
+				{
+					"visibility": "public",
+					"returnType": "int",
+					"name": "bar",
+					"params": ["int", "int"],
+					"exceptions": ["IndexOutOfBoundsException"]
+				},
+				{
+					"visibility": "public",
+					"returnType": "int",
+					"name": "compareTo",
+					"annotations": "@Override",
+					"params": ["Object"]
+				}
+			]
+		},
+		{
+			"className": "ParentClass",
+			"constructors": [
+				{
+					"params": ["String"]
+				}
+			],
+			"methods": [
+				{
+					"visibility": "public",
+					"returnType": "void",
+					"name": "foo",
+					"params": ["String", "int"]
+				}
+			]
+		},
+		{
+			"className": "Driver",
+			"methods": [
+				{
+					"visibility": "public",
+					"isStatic": true,
+					"returnType": "void",
+					"name": "main",
+					"params": ["String[]"]
+				}
+			]
+		}
+	],
+	"tests": [
+		{
+			"name": "testName0",
+			"points": 5,
+			"comment": "Something went wrong"
+		},
+		{
+			"name": "testName1",
+			"points": 20,
+			"comment": "Something really important went wrong."
+		}
+	]
+}
