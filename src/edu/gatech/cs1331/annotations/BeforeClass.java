@@ -1,4 +1,4 @@
-package edu.gatech.cs1331;
+package edu.gatech.cs1331.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

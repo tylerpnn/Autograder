@@ -1,6 +1,6 @@
-import edu.gatech.cs1331.Test;
-import edu.gatech.cs1331.BeforeClass;
-import edu.gatech.cs1331.AfterClass;
+import edu.gatech.cs1331.annotations.Test;
+import edu.gatech.cs1331.annotations.BeforeClass;
+import edu.gatech.cs1331.annotations.AfterClass;
 import static edu.gatech.cs1331.Assert.*;
 
 public class Tests {

@@ -7,7 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import edu.gatech.cs1331.Test.None;
+import edu.gatech.cs1331.annotations.AfterClass;
+import edu.gatech.cs1331.annotations.BeforeClass;
+import edu.gatech.cs1331.annotations.Test;
 import edu.gatech.cs1331.json.AutoGraderJson;
 import edu.gatech.cs1331.json.TestJson;
 
@@ -110,15 +112,17 @@ public class Tester {
 				while(System.currentTimeMillis() - time < annotation.timeout());
 				if(throwableThrown == null && !complete) {
 					throwableThrown = new TimeoutException(
-							"Operation timed out; took more than " + annotation.timeout() + " millis");
+							"Operation timed out; took more than "
+							+ annotation.timeout() + " millis");
 					t.interrupt();
 				}
 			} else {
 				runTest();
 			}
 			if(throwableThrown == null && !annotation.expected().equals(None.class)) {
-				Tester.this.handleThrowable(new ExceptionExpectedException(annotation.expected()), this);
-			}else if(throwableThrown != null) {
+				Tester.this.handleThrowable(
+						new ExceptionExpectedException(annotation.expected()), this);
+			} else if(throwableThrown != null) {
 				Tester.this.handleThrowable(throwableThrown, this);
 			}
 		}
