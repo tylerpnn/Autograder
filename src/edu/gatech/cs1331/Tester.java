@@ -5,22 +5,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
-import edu.gatech.cs1331.annotations.AfterClass;
-import edu.gatech.cs1331.annotations.BeforeClass;
-import edu.gatech.cs1331.annotations.Test;
+import edu.gatech.cs1331.Test.None;
 import edu.gatech.cs1331.json.AutoGraderJson;
 import edu.gatech.cs1331.json.TestJson;
 
 public class Tester {
 
 	private Class<?> clazz;
-	private Map<String, Method> methods;
+	private Map<String, Method> tests;
 	private Map<Method, Annotation> annotations;
 	private Method before, after;
-	
-	private StringBuilder comments;
-	private int lostPoints;
+	private Results results;
 	
 	public Tester(String className) {
 		
@@ -29,14 +26,14 @@ public class Tester {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
-		methods = new HashMap<>();
+
+		tests = new HashMap<>();
 		annotations = new HashMap<>();
 		
 		for(Method m : clazz.getMethods()) {
 			for(Annotation a : m.getAnnotations()) {
 				if(a instanceof Test) {
-					methods.put(m.getName(), m);
+					tests.put(m.getName(), m);
 					annotations.put(m, a);
 				} else if(before == null && a instanceof BeforeClass) {
 					before = m;
@@ -45,58 +42,93 @@ public class Tester {
 				}
 			}
 		}
-		
-		comments = new StringBuilder();
+		results = new Results(tests.keySet().size());
 	}
 	
-	private void failTest(TestJson test) {
-		comments.append(test.getComment() + " (-" + test.getPoints() + ")\n");
-		lostPoints += test.getPoints();
-	}
-	
-	public String toString() {
-		return String.format("%s\nPoints Lost: %d",
-				comments.toString(), lostPoints);
-	}
-	
-	public void runTests(AutoGraderJson agj) throws InstantiationException,
-													IllegalAccessException {
-		Object testObject = clazz.newInstance();
-		
-		if(before != null) {
-			try {
-				before.invoke(testObject);
-			} catch (IllegalArgumentException | InvocationTargetException e) {
-				e.printStackTrace();
-			}
+	public void startTests(AutoGraderJson agj) {
+		if(clazz == null) {
+			System.err.println("Test class is null");
+			System.exit(0);
 		}
-		int testnum = 0;
-		for(TestJson tj : agj.getTests()) {
-			System.out.printf("%d) %s:\t", testnum++, tj.getName());
-			Method test = methods.get(tj.getName());
-			if(test != null && annotations.containsKey(test)) {
-				try {
-					test.invoke(testObject);
-					System.out.printf("%s\n", "Pass");
-				} catch(InvocationTargetException e) {
-					Throwable target = e.getCause();
-					Test a = (Test) annotations.get(test);
-					if(target != null) {
-						if(target instanceof AssertionError) {
-							failTest(tj);
-						} else if(!(a.expected().isInstance(target))) {
-							failTest(tj);
-						}
-						target.printStackTrace();
-					}
+		
+		try {
+			Object testObject = clazz.newInstance();
+			if(before != null) before.invoke(testObject);
+			for(TestJson tj : agj.getTests()) {
+				Method test = tests.get(tj.getName());
+				Test an = (Test) annotations.get(test);
+				if(test != null && annotations.containsKey(test)) {
+					TestWrapper tw = new TestWrapper(testObject, tj, test, an);
+					tw.start();
 				}
 			}
+			if(after != null) after.invoke(testObject);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Results getResults() {
+		return results;
+	}
+	
+	private void handleThrowable(Throwable t, TestWrapper tw) {
+		Throwable target = t.getCause();
+		if(target != null) {
+			if(target instanceof AssertionError
+					|| !(tw.annotation.expected().isInstance(target))) {
+				results.addFailedTest(tw.tj, target);
+			}
+		} else if(t instanceof TimeoutException
+				|| t instanceof ExceptionExpectedException) {
+			results.addFailedTest(tw.tj, t);
+		}
+	}
+	
+	private class TestWrapper {
+		
+		private volatile Throwable throwableThrown;
+		private volatile boolean complete;
+		private Object testObject;
+		private TestJson tj;
+		private Method test;
+		private Test annotation;
+		
+		public TestWrapper(Object testObject, TestJson tj, Method test, Test an) {
+			this.testObject = testObject;
+			this.test = test;
+			this.tj = tj;
+			this.annotation = an;
 		}
 		
-		if(after != null) {
+		public void start() {
+			if(annotation.timeout() > 0l) {
+				Thread t = new Thread(() -> runTest());
+				t.start();
+				long time = System.currentTimeMillis();
+				while(System.currentTimeMillis() - time < annotation.timeout());
+				if(throwableThrown == null && !complete) {
+					throwableThrown = new TimeoutException(
+							"Operation timed out; took more than " + annotation.timeout() + " millis");
+					t.interrupt();
+				}
+			} else {
+				runTest();
+			}
+			if(throwableThrown == null && !annotation.expected().equals(None.class)) {
+				Tester.this.handleThrowable(new ExceptionExpectedException(annotation.expected()), this);
+			}else if(throwableThrown != null) {
+				Tester.this.handleThrowable(throwableThrown, this);
+			}
+		}
+		
+		private void runTest() {
 			try {
-				after.invoke(testObject);
-			} catch (IllegalArgumentException | InvocationTargetException e) {
+				test.invoke(testObject);
+				complete = true;
+			} catch(InvocationTargetException e) {
+				throwableThrown = e;
+			} catch(IllegalAccessException | IllegalArgumentException e) {
 				e.printStackTrace();
 			}
 		}

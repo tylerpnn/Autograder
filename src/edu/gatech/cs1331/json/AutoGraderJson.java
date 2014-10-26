@@ -1,9 +1,12 @@
 package edu.gatech.cs1331.json;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 
 public class AutoGraderJson {
 
@@ -18,15 +21,11 @@ public class AutoGraderJson {
 		return this.tests;
 	}
 	
-	public static AutoGraderJson buildClassList(String filename) {
+	public static AutoGraderJson buildClassList(String filename) throws FileNotFoundException,
+														JsonSyntaxException, JsonIOException {
 		AutoGraderJson agj = null;
-		try {
-			File json = new File(filename);
-			FileReader fr = new FileReader(json);
+		FileReader fr = new FileReader(new File(filename));
 		agj = (AutoGraderJson) new Gson().fromJson(fr, AutoGraderJson.class);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
 		return agj;
 	}
 }

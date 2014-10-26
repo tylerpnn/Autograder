@@ -9,6 +9,16 @@
 			"name": "doSomething",
 			"points": 15,
 			"comment": "you failed doSomething"
+		},
+		{
+			"name": "loopTest",
+			"points": "10",
+			"comment": "loop the loop"
+		},
+		{
+			"name": "exceptionTest",
+			"points": 10,
+			"comment:": "expect the unexcepted"
 		}
 	]
 }

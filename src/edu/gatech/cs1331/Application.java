@@ -10,9 +10,6 @@ public class Application {
 	private static String testClassName;
 	
 	public static void main(String ... args) {
-		if(args.length == 0) {
-			return;
-		}
 		
 		for(int i = 0; i < args.length; i++) {
 			if(args.length - i - 1 > 0) {
@@ -27,20 +24,21 @@ public class Application {
 			}
 		}
 		
-//		if(jsonFileName != null) testParse(jsonFileName);
-		
 		if(jsonFileName == null || testClassName == null) {
 			printHelp();
+			System.exit(0);
 		}
 		
 		Tester t = new Tester(testClassName);
-		AutoGraderJson agj = AutoGraderJson.buildClassList(jsonFileName);
+		AutoGraderJson agj = null;
 		try {
-			t.runTests(agj);
-		} catch (InstantiationException | IllegalAccessException e) {
+			agj = AutoGraderJson.buildClassList(jsonFileName);
+		} catch(Exception e) {
 			e.printStackTrace();
+			System.exit(0);
 		}
-		System.out.println("\n" + t.toString());
+		t.startTests(agj);
+		t.getResults().printResult(System.out);
 	}
 	
 	public static void printHelp() {
@@ -52,7 +50,13 @@ public class Application {
 	}
 	
 	public static void testParse(String filename) {
-		AutoGraderJson ag = AutoGraderJson.buildClassList(filename);
+		AutoGraderJson ag = null;
+		try {
+			ag = AutoGraderJson.buildClassList(jsonFileName);
+		} catch(Exception e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
 		for(ClassJson c : ag.getClasses()) {
 			System.out.printf("%s:\n\t", c.getClassName());
 			if(c.getMethods() == null) {
