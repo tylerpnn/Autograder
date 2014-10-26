@@ -9,11 +9,23 @@ public class TestJson {
 		return this.name;
 	}
 	
+	public void setName(String s) {
+		this.name = s;
+	}
+	
 	public String getComment() {
 		return this.comment;
 	}
 	
+	public void setComment(String s) {
+		this.comment = s;
+	}
+	
 	public int getPoints() {
 		return this.points;
+	}
+	
+	public void setPoints(int x) {
+		this.points = x;
 	}
 }

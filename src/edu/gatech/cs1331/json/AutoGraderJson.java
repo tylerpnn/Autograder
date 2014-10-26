@@ -17,8 +17,16 @@ public class AutoGraderJson {
 		return this.classes;
 	}
 	
+	public void setClasses(ClassJson[] classes) {
+		this.classes = classes;
+	}
+	
 	public TestJson[] getTests() {
 		return this.tests;
+	}
+	
+	public void setTests(TestJson[] tj) {
+		this.tests = tj;
 	}
 	
 	public static AutoGraderJson buildClassList(String filename) throws FileNotFoundException,

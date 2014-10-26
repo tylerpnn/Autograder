@@ -6,7 +6,7 @@ public class Assert {
 
 	protected Assert() {}
 	
-	private static void fail(String m) {
+	public static void fail(String m) {
 		if(m == null)
 			throw new AssertionError();
 		throw new AssertionError(m);
@@ -137,6 +137,22 @@ public class Assert {
 	
 	public static void assertNotEquals(long expected, long actual) {
 		assertTrue(expected != actual);
+	}
+	
+	public static void assertEquals(String m, double expected, double actual, double epsilon) {
+		assertTrue(m, Math.abs(expected - actual) < epsilon);
+	}
+	
+	public static void assertEquals(double expected, double actual, double epsilon) {
+		assertTrue(Math.abs(expected - actual) < epsilon);
+	}
+	
+	public static void assertEquals(String m, float expected, float actual, float epsilon) {
+		assertTrue(m, Math.abs(expected - actual) < epsilon);
+	}
+	
+	public static void assertEquals(float expected, float actual, float epsilon) {
+		assertTrue(Math.abs(expected - actual) < epsilon);
 	}
 	
 	

@@ -32,7 +32,7 @@ public class Results {
 		}
 		s.printf("\nTOTAL: %d, FAILURES: %d\n", totalTests, failedTests.size());
 		s.printf("\n%s\n", comments.toString());
-		s.printf("Points Lost: %d", lostPoints);
+		s.printf("Points Lost: %d\n", lostPoints);
 	}
 	
 	public void printResult() {
