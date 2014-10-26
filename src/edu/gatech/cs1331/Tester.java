@@ -104,6 +104,7 @@ public class Tester {
 		public void start() {
 			if(annotation.timeout() > 0l) {
 				Thread t = new Thread(() -> runTest());
+				t.setDaemon(true);
 				t.start();
 				long time = System.currentTimeMillis();
 				while(System.currentTimeMillis() - time < annotation.timeout());
