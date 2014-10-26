@@ -11,14 +11,14 @@
 			"comment": "you failed doSomething"
 		},
 		{
-			"name": "loopTest",
-			"points": "10",
-			"comment": "loop the loop"
+			"name": "exceptionTest",
+			"points": 15,
+			"comment": "expect the unexcepted"
 		},
 		{
-			"name": "exceptionTest",
+			"name": "loopTest",
 			"points": 10,
-			"comment:": "expect the unexcepted"
+			"comment": "loop the loop"
 		}
 	]
 }

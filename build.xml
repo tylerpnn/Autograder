@@ -26,6 +26,7 @@
 			<zipgroupfileset dir="${lib}" includes="*.jar" />
 			<manifest>
 				<attribute name="Main-Class" value="edu.gatech.cs1331.Application" />
+				<attribute name="Class-Path" value="." />
 			</manifest>
 		</jar>		
 	</target>

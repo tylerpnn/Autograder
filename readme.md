@@ -1,3 +1,13 @@
-My plans for this autograder:
+This project is a autograding and testing framework for java programs, written in java. It is very similar to junits, however it uses json to outline comments and point values with the tests. The json can also define expected class structure, and in the future, the class structure of the program being tested can also be evaluated against the class structure outline in the json.
 
-I want to be able to use json to define the entire expected class structure and all the information about each class. Eventually I will also write a program that will automatically generate the json by parsing supplied java files. The Json will also contain information about individual tests. The tests will function the same way as Junit tests, but with point values and comments associated with them. The autograder will be supplied a json and a java class containing all of the tests, and then run all of the tests corresponding to the test names in the json using reflection, and if the test is failed it will deduct the associated points and add the test's comment to the list of comments.
+Currently the program can parse the json outlining the tests and class structure, run tests (it is *almost* completely backwards-compatible with junits tests, just change your imports), and parse a provided java class containing tests (i.e. a class written using junits tests) to generate a json template for all of the tests contained in the class.
+
+Usage:
+
+To parse a pre-written test class and generate the json template:
+
+java -cp .:autograder.jar edu.gatech.cs1331.Parser [class_name] [output.json]
+
+To run a test file with a provided json:
+
+java -jar autograder.jar -t [class_name] [json_filename]
