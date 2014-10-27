@@ -109,7 +109,7 @@ public class Tester {
 				t.setDaemon(true);
 				t.start();
 				long time = System.currentTimeMillis();
-				while(System.currentTimeMillis() - time < annotation.timeout());
+				while(System.currentTimeMillis() - time < annotation.timeout() && !complete);
 				if(throwableThrown == null && !complete) {
 					throwableThrown = new TimeoutException(
 							"Operation timed out; took more than "
