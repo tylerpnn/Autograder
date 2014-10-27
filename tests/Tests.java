@@ -17,14 +17,14 @@ public class Tests {
 		assertEquals(h, w);
 	}
 
-	@Test
+	@Test(points=5)
 	public void doSomething() {
 		int[] a1 = {1, 2};
 		int[] a2 = {1, 2};
 		assertArrayEquals(a1, a2);
 	}
 	
-	@Test(timeout=5000l)
+	@Test(timeout=2000l)
 	public void loopTest() {
 		while(true);
 	}
