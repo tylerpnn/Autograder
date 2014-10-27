@@ -4,6 +4,8 @@ import edu.gatech.cs1331.annotations.AfterClass;
 import static edu.gatech.cs1331.Assert.*;
 
 public class Tests {
+
+	public boolean b;
 	
 	@BeforeClass
 	public void doBefore() {
@@ -12,16 +14,22 @@ public class Tests {
 
 	@Test
 	public void foo() {
-		String h = "Hello";
-		String w = "World";
-		assertEquals(h, w);
+		assertTrue(b);
+	}
+
+	@Test(depends="foo")
+	public void bar() {
+		b = true;
+	}
+
+	@Test
+	public void checkDepends() {
+		assertFalse(b);
 	}
 
 	@Test(points=5)
 	public void doSomething() {
-		int[] a1 = {1, 2};
-		int[] a2 = {1, 2};
-		assertArrayEquals(a1, a2);
+		assertEquals("hello", "world");
 	}
 	
 	@Test(timeout=2000l)

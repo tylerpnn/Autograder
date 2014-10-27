@@ -29,15 +29,15 @@ public class Application {
 			System.exit(0);
 		}
 		
-		Tester t = new Tester(testClassName);
-		AutoGraderJson agj = null;
+		Tester t = null;
 		try {
-			agj = AutoGraderJson.buildClassList(jsonFileName);
+			AutoGraderJson agj = AutoGraderJson.buildClassList(jsonFileName);
+			t = new Tester(testClassName, agj);
 		} catch(Exception e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
-		t.startTests(agj);
+		t.startTests();
 		t.getResults().printResult(System.out);
 	}
 	

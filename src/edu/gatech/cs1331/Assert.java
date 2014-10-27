@@ -20,7 +20,7 @@ public class Assert {
 	}
 	
 	public static void assertTrue(boolean condition) {
-		assertTrue(null, condition);
+		assertTrue("Expected: true, actual: false", condition);
 	}
 	
 	public static void assertFalse(String m, boolean condition) {
@@ -39,7 +39,7 @@ public class Assert {
 	}
 	
 	public static void assertEquals(Object expected, Object actual) {
-		String m = String.format("Expected: %s, got: %s",
+		String m = String.format("Expected: %s, actual: %s",
 				expected.toString(), actual.toString());
 		assertTrue(m, expected.equals(actual));
 	}

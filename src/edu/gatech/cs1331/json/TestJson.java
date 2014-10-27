@@ -28,4 +28,8 @@ public class TestJson {
 	public void setPoints(int x) {
 		this.points = x;
 	}
+	
+	public String toString() {
+		return this.name;
+	}
 }

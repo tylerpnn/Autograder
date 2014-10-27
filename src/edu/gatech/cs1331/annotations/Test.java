@@ -17,4 +17,6 @@ public @interface Test {
 	
 	int points() default 0;
 	
+	String[] depends() default "";
+	
 }

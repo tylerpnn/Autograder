@@ -19,6 +19,11 @@
 			"name": "loopTest",
 			"points": 10,
 			"comment": "loop the loop"
+		},
+		{
+			"name": "bar",
+			"points": 5,
+			"comment": "foobar'd"
 		}
 	]
 }
