@@ -6,8 +6,17 @@ Usage:
 
 To parse a pre-written test class and generate the json template:
 
-java -cp .:autograder.jar edu.gatech.cs1331.Parser [class_name] [output.json]
+java -cp .:/path/to/autograder.jar edu.gatech.cs1331.Parser [class_name] [output.json]
 
 To run a test file with a provided json:
 
-java -jar autograder.jar -t [class_name] [json_filename]
+java -jar autograder.jar -t [class_name] -j [json_filename]
+	or
+java -cp .:/path/to/autograder.jar -t [class_name] -j [json_filename]
+
+
+Writing tests:
+
+If you have a junits test class written already, you (most likely) just change the imports and it will run with this program. Annotations are in package edu.gatech.cs1331.annotations, and Asserts are in edu.gatech.cs1331.Assert.
+
+This framework also supports adding dependencies to a test. In the @Test annotation, assign the "depends" parameter to a list of strings of the names of the tests (e.g. @Test(depends="foo","bar")) that the test depends on. If any of the dependency tests fail, the test will not run, and you will be notified in the output that it did not run along with which of its dependencies that failed.

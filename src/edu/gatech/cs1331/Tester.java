@@ -100,7 +100,8 @@ public class Tester {
 			while(!pending.isEmpty()) {
 				TestWrapper next = pending.poll();
 				if(!next.annotation.depends()[0].equals("")) {
-					TestWrapper[] dependencies = new TestWrapper[next.annotation.depends().length];
+					TestWrapper[] dependencies =
+							new TestWrapper[next.annotation.depends().length];
 					for(int i=0; i < dependencies.length; i++) {
 						dependencies[i] = tests.get(next.annotation.depends()[i]);
 					}
@@ -117,7 +118,8 @@ public class Tester {
 						next.time = System.currentTimeMillis();
 						pending.add(next);
 					} else if(failed) {
-						results.addFailedDependency(next.tj, failedDependencies.toArray(new TestJson[0]));
+						results.addFailedDependency(next.tj,
+								failedDependencies.toArray(new TestJson[0]));
 					}
 				} else {
 					next.start(testObject);
