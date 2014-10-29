@@ -14,7 +14,7 @@ To run a test file with a provided json:
 
 or
 
-`java -cp .:/path/to/autograder.jar -t [class_name] -j [json_filename]`
+`java -cp .:/path/to/autograder.jar edu.gatech.cs1331.Application -t [class_name] -j [json_filename]`
 
 
 Writing tests:
