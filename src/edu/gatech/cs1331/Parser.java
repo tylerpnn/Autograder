@@ -38,7 +38,7 @@ public class Parser {
 				if(a instanceof Test) {
 					TestJson tj = new TestJson();
 					tj.setName(m.getName());
-					tj.setComment("");
+					tj.setComment(((Test)a).comment());
 					tj.setPoints(((Test)a).points());
 					tests.add(tj);
 				}
