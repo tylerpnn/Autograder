@@ -27,6 +27,12 @@ public class Tests {
 		assertFalse(b);
 	}
 
+	@Test(depends="checkDepends")
+	public void doubleCheckDepends() {
+		System.out.println("checked depends");
+		assertTrue(true);
+	}
+
 	@Test(points=5)
 	public void doSomething() {
 		assertEquals("hello", "world");

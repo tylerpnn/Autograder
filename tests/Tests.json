@@ -24,6 +24,16 @@
 			"name": "bar",
 			"points": 5,
 			"comment": "foobar'd"
+		},
+		{
+			"name": "checkDepends",
+			"points": 5,
+			"comment": "checks dependencies"
+		},
+		{
+			"name": "doubleCheckDepends",
+			"points": 5,
+			"comment": "double checks dependencies"
 		}
 	]
 }

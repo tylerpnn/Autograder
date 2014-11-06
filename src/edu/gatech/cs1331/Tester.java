@@ -3,12 +3,16 @@ package edu.gatech.cs1331;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
+import java.util.List;
 import java.util.Queue;
+import java.util.Stack;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import edu.gatech.cs1331.annotations.AfterClass;
 import edu.gatech.cs1331.annotations.BeforeClass;
@@ -22,30 +26,35 @@ public class Tester {
 	private HashMap<String, TestWrapper> tests;
 	private Method before, after;
 	private Results results;
-	Queue<TestWrapper> pending;
+	private Queue<TestWrapper> pending;
 	
 	public Tester(String className, AutoGraderJson agj) throws Exception {
 		clazz = Class.forName(className);
-		tests = new HashMap<>();		
-		for(Method m : clazz.getMethods()) {
+		tests = new HashMap<>();
+		List<Method> methods = Arrays.asList(clazz.getMethods());
+		for(Method m : methods) {
 			for(Annotation a : m.getAnnotations()) {
-				if(a instanceof Test) {
-					TestWrapper tw = new TestWrapper(m, (Test) a);
-					tests.put(m.getName(), tw);
-				} else if(before == null && a instanceof BeforeClass) {
+				if(before == null && a instanceof BeforeClass) {
 					before = m;
 				} else if(after == null && a instanceof AfterClass) {
 					after = m;
 				}
 			}
 		}
-		
-		pending = new PriorityQueue<>();
-		for(TestJson tj : agj.getTests()) {
-			TestWrapper tw = tests.get(tj.getName());
-			if(tw != null) {
-				tw.tj = tj;
-				pending.add(tw);
+
+		pending = new ArrayDeque<>();
+		List<TestJson> json = Arrays.asList(agj.getTests());
+		for(TestJson tj : json) {
+			for(Method m : methods) {
+				if(m.getName().equals(tj.getName())) {
+					for(Annotation a : m.getAnnotations()) {
+						if(a instanceof Test) {
+							TestWrapper tw = new TestWrapper(m, (Test) a, tj);
+							tests.put(tj.getName(), tw);
+							pending.add(tw);
+						}
+					}
+				}
 			}
 		}
 		
@@ -61,30 +70,31 @@ public class Tester {
 				graph.get(t).add(tests.get(s));
 			}
 		}
-		class MyHashMap extends HashMap<TestWrapper, Boolean> {
+		HashMap<TestWrapper, Boolean> visited = new HashMap<TestWrapper, Boolean>() {
 			public Boolean get(Object k) { return containsKey(k) ? super.get(k) : false; }
-		}
-		HashMap<TestWrapper, Boolean> visited = new MyHashMap();
-		HashMap<TestWrapper, Boolean> stack = new MyHashMap();
+		};
+		Stack<TestWrapper> stack = new Stack<>();
 		for(TestWrapper t : tws) {
-			if(isCyclic(graph, t, visited, stack))
+			stack.push(t);
+			if(isCyclic(graph, t, visited, stack)) {
 				throw new Exception("Please resolve cyclic dependencies");
+			}
 		}
 	}
 	
-	private boolean isCyclic(HashMap<TestWrapper, LinkedList<TestWrapper>> graph, TestWrapper t,
-					HashMap<TestWrapper, Boolean> visited, HashMap<TestWrapper, Boolean> stack) {
-		if(!visited.get(t)) {
-			visited.put(t, true);
-			stack.put(t, true);
-			for(TestWrapper tw : graph.get(t)) {
-				if(!visited.get(tw) && isCyclic(graph, t, visited, stack))
+	private boolean isCyclic(HashMap<TestWrapper, LinkedList<TestWrapper>> graph, TestWrapper u,
+							 HashMap<TestWrapper, Boolean> visited, Stack<TestWrapper> stack) {
+		if(!visited.get(u)) {
+			visited.put(u, true);
+			stack.push(u);
+			for(TestWrapper v : graph.get(u)) {
+				if(!visited.get(v) && isCyclic(graph, u, visited, stack))
 					return true;
-				else if(stack.get(t))
+				else if(stack.contains(v))
 					return true;
 			}
 		}
-		stack.put(t, false);
+		stack.pop();
 		return false;
 	}
 	
@@ -100,11 +110,10 @@ public class Tester {
 			while(!pending.isEmpty()) {
 				TestWrapper next = pending.poll();
 				if(!next.annotation.depends()[0].equals("")) {
-					TestWrapper[] dependencies =
-							new TestWrapper[next.annotation.depends().length];
-					for(int i=0; i < dependencies.length; i++) {
-						dependencies[i] = tests.get(next.annotation.depends()[i]);
-					}
+					List<TestWrapper> dependencies = 
+							Arrays.asList(next.annotation.depends()).stream()
+								.map(s -> tests.get(s))
+								.collect(Collectors.toList());
 					ArrayList<TestJson> failedDependencies = new ArrayList<>();
 					boolean failed = false, complete = true;
 					for(TestWrapper d : dependencies) {
@@ -115,11 +124,12 @@ public class Tester {
 						complete = d.complete || complete;
 					}
 					if(!complete) {
-						next.time = System.currentTimeMillis();
 						pending.add(next);
 					} else if(failed) {
 						results.addFailedDependency(next.tj,
 								failedDependencies.toArray(new TestJson[0]));
+					} else {
+						next.start(testObject);
 					}
 				} else {
 					next.start(testObject);
@@ -150,24 +160,23 @@ public class Tester {
 		}
 	}
 	
-	private class TestWrapper implements Comparable<TestWrapper> {
+	private class TestWrapper {
 		
 		private volatile Throwable throwableThrown;
 		private volatile boolean complete, failed;
 		private TestJson tj;
 		private Method test;
 		private Test annotation;
-		private long time;
 		
-		public TestWrapper(TestJson tj, Method test, Test an) {
+		public TestWrapper(Method test, Test an, TestJson tj) {
 			this.test = test;
 			this.tj = tj;
 			this.annotation = an;
 		}
 		
-		public TestWrapper(Method test, Test an) {
-			this(null, test, an);
-		}
+//		public TestWrapper(Method test, Test an) {
+//			this(test, an, null);
+//		}
 		
 		public void start(Object testObject) {
 			if(annotation.timeout() > 0l) {
@@ -202,11 +211,6 @@ public class Tester {
 			} catch(IllegalAccessException | IllegalArgumentException e) {
 				e.printStackTrace();
 			}
-		}
-
-		@Override
-		public int compareTo(TestWrapper o) {
-			return (int) (time - o.time);
 		}
 	}
 }
