@@ -6,13 +6,15 @@ Usage:
 
 To parse a pre-written test class and generate the json template:
 
-java -cp .:/path/to/autograder.jar edu.gatech.cs1331.Parser [class_name] [output.json]
+`java -cp .:/path/to/autograder.jar edu.gatech.cs1331.Parser [class_name] [output.json]`
 
 To run a test file with a provided json:
 
-java -jar autograder.jar -t [class_name] -j [json_filename]
-	or
-java -cp .:/path/to/autograder.jar -t [class_name] -j [json_filename]
+`java -jar autograder.jar -t [class_name] -j [json_filename]`
+
+or
+
+`java -cp .:/path/to/autograder.jar edu.gatech.cs1331.Application -t [class_name] -j [json_filename]`
 
 
 Writing tests:

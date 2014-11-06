@@ -16,6 +16,8 @@ public @interface Test {
 	Class<? extends Throwable> expected() default None.class;
 	
 	int points() default 0;
+
+    String comment() default "";
 	
 	String[] depends() default "";
 	

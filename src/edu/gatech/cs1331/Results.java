@@ -34,8 +34,8 @@ public class Results {
 		for(int i = 0; i < failedTests.size(); i++) {
 			FailedTestWrapper fail = failedTests.get(i);
 			s.printf("%d) %s", i, fail);
-			comments.append(String.format("%s (-%d)\n",
-					fail.getComment(), fail.getPoints()));
+			comments.append(String.format("(-%d) %s\n",
+			    fail.getPoints(), fail.getComment()));
 			lostPoints += fail.getPoints();
 		}
 		if(failedDependencies.keySet().size() > 0) {
