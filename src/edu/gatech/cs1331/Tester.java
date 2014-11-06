@@ -174,10 +174,6 @@ public class Tester {
 			this.annotation = an;
 		}
 		
-//		public TestWrapper(Method test, Test an) {
-//			this(test, an, null);
-//		}
-		
 		public void start(Object testObject) {
 			if(annotation.timeout() > 0l) {
 				Thread t = new Thread(() -> runTest(testObject));

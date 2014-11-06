@@ -1,5 +1,9 @@
 package edu.gatech.cs1331;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import edu.gatech.cs1331.json.AutoGraderJson;
 import edu.gatech.cs1331.json.ClassJson;
 import edu.gatech.cs1331.json.ClassJson.MethodJson;
@@ -8,19 +12,24 @@ public class Application {
 	
 	private static String jsonFileName;
 	private static String testClassName;
+	private static String outputFileName;
+	private static boolean concise;
 	
 	public static void main(String... args) {
 		
 		for(int i = 0; i < args.length; i++) {
-			if(args.length - i - 1 > 0) {
+			if(args[i].equals("-h")) {
+				printHelp();
+				System.exit(0);
+			} else if(args.length - i > 1) {
 				if(args[i].equals("-j")) {
 					jsonFileName = args[i+1];
 				} else if(args[i].equals("-t")) {
 					testClassName = args[i+1];
-				} else if(args[i].equals("-h")) {
-					printHelp();
-					System.exit(0);
+				} else if(args[i].equals("-o")) {
+					outputFileName = args[i+1];
 				}
+				concise |= args[i].equals("-c");
 			}
 		}
 		
@@ -38,14 +47,24 @@ public class Application {
 			System.exit(0);
 		}
 		t.startTests();
-		t.getResults().printResult(System.out);
+		if(outputFileName != null) {
+			try(FileOutputStream fos = new FileOutputStream(new File(outputFileName))) {
+				t.getResults().printResult(fos, concise);
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			t.getResults().printResult(System.err, concise);
+		}
 	}
 	
 	public static void printHelp() {
-		System.out.printf("%s\n%s\n%s\n%s\n",
+		System.out.printf(new String(new char[6]).replace("\0", "%s\n"),
 				"Autograder help:",
 				"\t-j\tJson filename",
 				"\t-t\tTest Class Name",
+				"\t-o\tOutput filename",
+				"\t-c\tExclude test stack traces",
 				"\t-h\tPrint this help");
 	}
 	

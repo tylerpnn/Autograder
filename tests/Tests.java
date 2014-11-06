@@ -29,7 +29,6 @@ public class Tests {
 
 	@Test(depends="checkDepends")
 	public void doubleCheckDepends() {
-		System.out.println("checked depends");
 		assertTrue(true);
 	}
 

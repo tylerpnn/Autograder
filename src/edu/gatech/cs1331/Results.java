@@ -1,6 +1,7 @@
 package edu.gatech.cs1331;
 
-import java.io.PrintStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,31 +30,33 @@ public class Results {
 		failedDependencies.put(test, dependencies);
 	}
 	
-	public void printResult(PrintStream s) {
+	public void printResult(OutputStream out, boolean concise) {
+		PrintWriter p = new PrintWriter(out);
 		StringBuilder comments = new StringBuilder();
 		for(int i = 0; i < failedTests.size(); i++) {
 			FailedTestWrapper fail = failedTests.get(i);
-			s.printf("%d) %s", i, fail);
+			if(!concise) p.printf("%d) %s", i, fail);
 			comments.append(String.format("(-%d) %s\n",
 			    fail.getPoints(), fail.getComment()));
 			lostPoints += fail.getPoints();
 		}
 		if(failedDependencies.keySet().size() > 0) {
-			s.println("\nThe following tests did not run due to failed dependencies:");
+			p.println("\nThe following tests did not run due to failed dependencies:");
 			for(TestJson t : failedDependencies.keySet()) {
-				s.printf("\t%s, failed dependencies: %s\n",
+				p.printf("\t%s, failed dependencies: %s\n",
 						t.getName(), Arrays.toString(failedDependencies.get(t)));
 				
 			}
 		}
-		s.printf("\nTOTAL: %d, RAN: %d, FAILURES: %d\n",
+		p.printf("\nTOTAL: %d, RAN: %d, FAILURES: %d\n",
 				totalTests, totalTests - failedDependencies.size(), failedTests.size());
-		s.printf("\n%s\n", comments.toString());
-		s.printf("Points Lost: %d\n", lostPoints);
+		p.printf("\n%s\n", comments.toString());
+		p.printf("Points Lost: %d\n", lostPoints);
+		p.close();
 	}
 	
 	public void printResult() {
-		printResult(System.err);
+		printResult(System.err, false);
 	}
 	
 	private class FailedTestWrapper {
@@ -70,7 +73,8 @@ public class Results {
 		}
 		
 		public String getComment() {
-			return test.getComment();
+			return test.getComment().equals("") ?
+					throwable.getMessage() : test.getComment();
 		}
 		
 		public String toString() {

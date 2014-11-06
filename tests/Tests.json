@@ -3,7 +3,7 @@
 		{
 			"name": "foo",
 			"points": 20,
-			"comment": "you failed foo"
+			"comment": ""
 		},
 		{
 			"name": "doSomething",
