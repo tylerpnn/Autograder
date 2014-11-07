@@ -84,11 +84,11 @@ public class Tester {
 	
 	private boolean isCyclic(HashMap<TestWrapper, LinkedList<TestWrapper>> graph, TestWrapper u,
 							 HashMap<TestWrapper, Boolean> visited, Stack<TestWrapper> stack) {
-		if(!visited.get(u)) {
+		if(u != null && !visited.get(u)) {
 			visited.put(u, true);
 			stack.push(u);
 			for(TestWrapper v : graph.get(u)) {
-				if(!visited.get(v) && isCyclic(graph, u, visited, stack))
+				if(!visited.get(v) && isCyclic(graph, v, visited, stack))
 					return true;
 				else if(stack.contains(v))
 					return true;
