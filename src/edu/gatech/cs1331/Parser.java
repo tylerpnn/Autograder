@@ -37,11 +37,11 @@ public class Parser {
 			for(Annotation a : m.getAnnotations()) {
 				if(a instanceof Test) {
 					TestJson tj = new TestJson();
-                    Test t = (Test)a;
+					Test t = (Test)a;
 					tj.setName(m.getName());
 					tj.setComment(t.comment());
 					tj.setPoints(t.points());
-                    tj.setExtraCredit(t.extraCredit());
+					tj.setExtraCredit(t.extraCredit());
 					tests.add(tj);
 				}
 			}
