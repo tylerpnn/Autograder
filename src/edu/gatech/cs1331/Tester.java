@@ -201,6 +201,7 @@ public class Tester {
 		private void runTest(Object testObject) {
 			try {
 				test.invoke(testObject);
+                results.addPassedTest(tj);
 				complete = true;
 			} catch(InvocationTargetException e) {
 				throwableThrown = e;

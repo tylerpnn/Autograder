@@ -20,5 +20,7 @@ public @interface Test {
     String comment() default "";
 	
 	String[] depends() default "";
+
+    boolean extraCredit() default false;
 	
 }
