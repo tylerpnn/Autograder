@@ -17,8 +17,10 @@ public @interface Test {
 	
 	int points() default 0;
 
-    String comment() default "";
+	String comment() default "";
 	
 	String[] depends() default "";
+
+	boolean extraCredit() default false;
 	
 }

@@ -4,6 +4,7 @@ public class TestJson {
 	
 	private String name, comment;
 	private int points;
+	private boolean extraCredit;
 	
 	public String getName() {
 		return this.name;
@@ -27,6 +28,14 @@ public class TestJson {
 	
 	public void setPoints(int x) {
 		this.points = x;
+	}
+
+	public boolean isExtraCredit() {
+		return this.extraCredit;
+	}
+
+	public void setExtraCredit(boolean b) {
+		this.extraCredit = b;
 	}
 	
 	public String toString() {
