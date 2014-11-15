@@ -121,13 +121,13 @@ public class Tester {
 							failed = true;
 							failedDependencies.add(d.tj);
 						}
-						complete = d.complete || complete;
+						complete = complete && d.complete;
 					}
-					if(!complete) {
-						pending.add(next);
-					} else if(failed) {
+					if(failed) {
 						results.addFailedDependency(next.tj,
 								failedDependencies.toArray(new TestJson[0]));
+					} else if(!complete) {
+						pending.add(next);
 					} else {
 						next.start(testObject);
 					}
