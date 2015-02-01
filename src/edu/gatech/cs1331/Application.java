@@ -29,8 +29,8 @@ public class Application {
 				} else if(args[i].equals("-o")) {
 					outputFileName = args[i+1];
 				}
-				concise |= args[i].equals("-c");
 			}
+			concise |= args[i].equals("-c");
 		}
 		
 		if(jsonFileName == null || testClassName == null) {

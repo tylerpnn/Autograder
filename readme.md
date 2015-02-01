@@ -10,7 +10,7 @@ To parse a pre-written test class and generate the json template:
 
 To run a test file with a provided json:
 
-`java -jar autograder.jar -t [class_name] -j [json_filename]`
+`java -jar autograder.jar -t [class_filename] -j [json_filename]`
 
 or
 
