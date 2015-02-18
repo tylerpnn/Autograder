@@ -13,14 +13,18 @@ public @interface Test {
 
 	long timeout() default 0L;
 	
-	Class<? extends Throwable> expected() default None.class;
+	Class<? extends Throwable> expectedException() default None.class;
 	
 	int points() default 0;
 
 	String comment() default "";
 	
-	String[] depends() default "";
+	String dependencies() default "";
+	
+	String ifFailed() default "";
 
 	boolean extraCredit() default false;
+	
+	boolean silent() default false;
 	
 }

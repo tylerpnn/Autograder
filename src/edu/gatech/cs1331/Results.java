@@ -13,19 +13,23 @@ public class Results {
 
 	private List<CompletedTestWrapper> tests;
 	private HashMap<TestJson, TestJson[]> failedDependencies;
+	private List<TestJson> dependenciesNotFailed;
 	private int totalTests;
 	private int lostPoints;
-	private int extraPoints;
-	private int totalPoints;
 	
 	public Results(int totalTests) {
 		tests = new ArrayList<>();
 		failedDependencies = new HashMap<>();
+		dependenciesNotFailed = new ArrayList<>();
 		this.totalTests = totalTests;
 	}
 	
 	public void addFailedTest(TestJson test, Throwable throwable) {
 		tests.add(new FailedTestWrapper(test, throwable));
+	}
+	
+	public void addFailedTest(TestJson test, Throwable throwable, int points) {
+		tests.add(new FailedTestWrapper(test, throwable, points));
 	}
 
 	public void addPassedTest(TestJson test) {
@@ -36,18 +40,31 @@ public class Results {
 		failedDependencies.put(test, dependencies);
 	}
 	
+	public void addDependencyNotFailed(TestJson test) {
+		dependenciesNotFailed.add(test);
+	}
+	
 	public void printResult(OutputStream out, boolean concise) {
 		PrintWriter p = new PrintWriter(out);
 		StringBuilder comments = new StringBuilder();
 		for(int i = 0; i < tests.size(); i++) {
 			CompletedTestWrapper test = tests.get(i);
-			if(test.failed() || test.isExtraCredit()) {
+			if(test.failed() && !test.isSilent()) {
 				if(!concise) p.printf("%d) %s", i, test);
-				comments.append(String.format("(%s%d) %s\n",
-					test.isExtraCredit() ? "+" : "-", test.getPoints(), test.getComment()));
+				if(test.getComment() != null && test.getPoints() != 0) {
+					comments.append(String.format("(-%d) %s\n", 
+							test.getPoints(), test.getComment()));
+					lostPoints += test.getPoints();
+				}
+			} else if(test.isExtraCredit()) {
+				if(test.getComment() != null &&
+						!test.getComment().equals("") && test.getPoints() != 0) {
+					comments.append(String.format("(+%d) %s\n", 
+							test.getPoints(), test.getComment()));
+				}
+				lostPoints -= test.getPoints();
 			}
-			totalPoints += test.getPoints();
-		} 
+		}
 		if(failedDependencies.keySet().size() > 0) {
 			p.println("\nThe following tests did not run due to failed dependencies:");
 			for(TestJson t : failedDependencies.keySet()) {
@@ -56,24 +73,20 @@ public class Results {
 				
 			}
 		}
-		
-		lostPoints += tests.stream().filter(CompletedTestWrapper::failed)
-			.mapToInt(CompletedTestWrapper::getPoints).sum();
-
-		extraPoints += tests.stream().filter(CompletedTestWrapper::isExtraCredit)
-			.mapToInt(CompletedTestWrapper::getPoints).sum();
-
-		totalPoints -= extraPoints;
-
+		if(dependenciesNotFailed.size() > 0) {
+			p.print("\nThe following tests didn't run because they required another test to fail:\n\t");
+			for(TestJson tj : dependenciesNotFailed) {
+				p.print(tj.getName() + ", ");
+			}
+			p.println();
+		}
 
 		p.printf("\nTOTAL: %d, RAN: %d, FAILURES: %d\n",
-				totalTests, totalTests - failedDependencies.size(), tests.stream()
-				.filter(CompletedTestWrapper::failed).count());
-		p.printf("\n%s\n", comments.toString());
-
+				totalTests, totalTests - failedDependencies.size() - dependenciesNotFailed.size(),
+				tests.stream().filter(CompletedTestWrapper::failed).count());
 		p.printf("Points Lost: %d\n", lostPoints);
-		p.printf("Extra Credit Points: %d\n", extraPoints); 
-		p.printf("Score: %d/%d\n", totalPoints - lostPoints + extraPoints, totalPoints);
+		p.printf("\n%s", comments.toString());
+
 		p.close();
 	}
 	
@@ -92,6 +105,10 @@ public class Results {
 		protected CompletedTestWrapper(TestJson t, boolean f) {
 			this(t);
 			this.failed = f;
+		}
+		
+		public boolean isSilent() {
+			return test.isSilent();
 		}
 		
 		public int getPoints() {
@@ -113,14 +130,30 @@ public class Results {
 		public boolean isExtraCredit() {
 			return test.isExtraCredit();
 		}
+		
+		public TestJson getJson() {
+			return test;
+		}
 	}
 
 	private class FailedTestWrapper extends CompletedTestWrapper {
 		private Throwable throwable;
+		private boolean pointsOverride;
+		private int points;
 		
 		public FailedTestWrapper(TestJson t, Throwable th) {
 			super(t, true);
 			throwable = th;
+		}
+		
+		public FailedTestWrapper(TestJson t, Throwable th, int points) {
+			this(t, th);
+			this.points = points;
+			pointsOverride = true;
+		}
+		
+		public int getPoints() {
+			return (pointsOverride) ? points : super.getPoints();
 		}
 
 		public String getComment() {

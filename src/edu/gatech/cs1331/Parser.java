@@ -42,6 +42,9 @@ public class Parser {
 					tj.setComment(t.comment());
 					tj.setPoints(t.points());
 					tj.setExtraCredit(t.extraCredit());
+					tj.setSilent(t.silent());
+					tj.setIfFailed(t.ifFailed());
+					tj.setDependencies(t.dependencies());
 					tests.add(tj);
 				}
 			}

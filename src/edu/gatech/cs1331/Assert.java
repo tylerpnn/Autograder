@@ -12,6 +12,12 @@ public class Assert {
 		throw new AssertionError(m);
 	}
 	
+	public static void fail(String m, int points) {
+		if(m == null)
+			throw new AssertionErrorWithPoints(points);
+		throw new AssertionErrorWithPoints(m, points);
+	}
+	
 
 	/********		TRUE/FALSE		********/
 	public static void assertTrue(String m, boolean condition) {
@@ -19,16 +25,27 @@ public class Assert {
 			fail(m);
 	}
 	
+	public static void assertTrue(String m, boolean condition, int points) {
+		if(!condition)
+			fail(m, points);
+	}
+	
 	public static void assertTrue(boolean condition) {
 		assertTrue("Expected: true, actual: false", condition);
 	}
 	
 	public static void assertFalse(String m, boolean condition) {
-		assertTrue(m, !condition);
+		if(condition)
+			fail(m);
+	}
+	
+	public static void assertFalse(String m, boolean condition, int points) {
+		if(condition)
+			fail(m, points);
 	}
 	
 	public static void assertFalse(boolean condition) {
-		assertTrue(!condition);
+		assertTrue("Expected: false, actual: true", !condition);
 	}
 	
 
